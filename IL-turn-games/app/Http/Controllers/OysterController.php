@@ -634,10 +634,12 @@ class OysterController extends Controller
         if ($result->player1 === $player_id) {
             // プレイヤーのステータスを0に戻す
             $player_obj->update_status($player_id, 0);
-            return $result->winner === 1 ? view('win') : view('lose');
+            // return $result->winner === 1 ? view('win') : view('lose');
+            return $result->winner === 1 ? 0 : 1;
         } elseif ($result->player2 === $player_id) {
             $player_obj->update_status($player_id, 0);
-            return $result->winner === 2 ? view('win') : view('lose');
+            // return $result->winner === 2 ? view('win') : view('lose');
+            return $result->winner === 2 ? 0 : 1;
         }
 
         // どちらのプレイヤーにも該当しない場合
