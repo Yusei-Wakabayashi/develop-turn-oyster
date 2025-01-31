@@ -12,7 +12,7 @@
         <label for="">もう一度</label>
         <button type="submit" class="btn btn-primary">開始</button>
     </form>
-    <form action="{{ url('/') }}" method="GET">
+    <form action="{{ url('/oyster/title') }}" method="GET">
         @csrf
         <label for="">タイトルに戻る</label>
         <button type="submit" class="btn btn-primary">終了</button>
