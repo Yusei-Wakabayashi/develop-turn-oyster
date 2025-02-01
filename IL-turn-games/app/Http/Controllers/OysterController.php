@@ -129,9 +129,11 @@ class OysterController extends Controller
         $player = $player_obj->get_player($player_id);
         // ゲームの情報を取得
         $game = $game_obj->get_game($game_id);
+        // DBに保存されているプレイヤーのボード情報を取得
+        $player_board = $game->plater1 === $player_id ? $game->player1_board : $game->player2_board;
 
-        // プレイヤーのステータスが2(準備中)かつゲームのステータスが0(準備中)の場合
-        if($player->status === 2 && $game->status === 0)
+        // プレイヤーのステータスが2(準備中)かつゲームのステータスが0(準備中)かつプレイヤーのボードが初期状態の場合
+        if($player->status === 2 && $game->status === 0 && $player_board === "000000000000000000000000")
         {
             $first = OysterController::first($game_id, $player_id);
             // ボードの状態が正しいかどうかを確認
@@ -148,8 +150,8 @@ class OysterController extends Controller
                 return response()->json(['message' => 'error']);
             }
         }
-        // プレイヤーのステータスが2(準備中)かつゲームのステータスが1(片方のプレイヤーが準備完了)の場合
-        else if($player->status === 2 && $game->status === 1)
+        // プレイヤーのステータスが2(準備中)かつゲームのステータスが1(片方のプレイヤーが準備完了)かつプレイヤーの状態が初期状態の場合
+        else if($player->status === 2 && $game->status === 1 && $player_board === "000000000000000000000000")
         {
             $first = OysterController::first($game_id, $player_id);
             // ボードの状態が正しいかどうかを確認
