@@ -59,7 +59,8 @@ class OysterController extends Controller
                 // マッチングイベント発行
                 event(new OysterPreparation($room->id));
                 // 準備画面を返す
-                return view('preparation', ['game_id' => $game_id]);
+                return response()->json(['game_id' => $game_id]);
+                // return view('preparation', ['game_id' => $game_id]);
             }
             // ルームのステータスが0(空き)のものを取得
             $room = $room_obj->search_status(0);
@@ -71,7 +72,8 @@ class OysterController extends Controller
                 // プレイヤーのステータスを1(待機中)に変更
                 $player_obj->update_status($player_id, 1);
                 // 待機画面とroom_idを返す
-                return view('standby', ['room_id' => $room->id]);
+                return response()->json(['room_id' => $room->id]);
+                // return view('standby', ['room_id' => $room->id]);
             }
             // ルームが存在しない場合ルームを作成する処理を書く
             return response()->json(['player_id' => $player_id]);
@@ -82,14 +84,16 @@ class OysterController extends Controller
             // プレイヤーが参加しているルームを取得
             $room = $room_obj->search_player($player_id);
             // 待機画面とroom_idを返す
-            return view('standby', ['room_id' => $room->id]);
+            return response()->json(['room_id' => $room->id]);
+            // return view('standby', ['room_id' => $room->id]);
         }
         elseif($player->status === 2)
         {
             $game_obj = new OysterGame();
             $game = $game_obj->player_game($player_id);
             // 準備画面を返す処理を書く
-            return view('preparation', ['game_id' => $game->id]);
+            return response()->json(['game_id' => $game->id]);
+            // return view('preparation', ['game_id' => $game->id]);
         }
     }
 
@@ -130,7 +134,7 @@ class OysterController extends Controller
         // ゲームの情報を取得
         $game = $game_obj->get_game($game_id);
         // DBに保存されているプレイヤーのボード情報を取得
-        $player_board = $game->plater1 === $player_id ? $game->player1_board : $game->player2_board;
+        $player_board = $game->player1 === $player_id ? $game->player1_board : $game->player2_board;
 
         // プレイヤーのステータスが2(準備中)かつゲームのステータスが0(準備中)かつプレイヤーのボードが初期状態の場合
         if($player->status === 2 && $game->status === 0 && $player_board === "000000000000000000000000")
@@ -151,7 +155,7 @@ class OysterController extends Controller
             }
         }
         // プレイヤーのステータスが2(準備中)かつゲームのステータスが1(片方のプレイヤーが準備完了)かつプレイヤーの状態が初期状態の場合
-        else if($player->status === 2 && $game->status === 1 && $player_board === "000000000000000000000000")
+        else if($player->status === 2 && $game->status === 1 && $player_board == "000000000000000000000000")
         {
             $first = OysterController::first($game_id, $player_id);
             // ボードの状態が正しいかどうかを確認
