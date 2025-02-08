@@ -641,8 +641,8 @@ class OysterController extends Controller
         $player = $player_obj->get_player($player_id);
         // ゲームの情報を取得
         $game = $game_obj->player_game($player_id);
-        // $return_data = OysterController::first($game->id, $request->session()->get('player_id'));
-        $return_data = OysterController::first($game->id, $request->session()->get('player_id')) ? 1 : 0;
+        $return_data = OysterController::first($game->id, $request->session()->get('player_id'));
+        // $return_data = OysterController::first($game->id, $request->session()->get('player_id')) ? 1 : 0;
         return response()->json(['first' => $return_data]);
     }
     // result画面を返す
@@ -668,15 +668,14 @@ class OysterController extends Controller
         if (!$result) {
             return response()->json(['message' => 'Game result not found'], 404);
         }
-
+        // 余りを求める奇数ならplayer1の勝利、偶数ならplayer2の勝利
+        $rem = $result->winner % 2;
+        // 商から勝利の理由を求める
+        $win_result = ($result->winner + $rem) / 2;
         // プレイヤーがplayer1またはplayer2であるかを確認
         if ($result->player1 === $player_id) {
             // プレイヤーのステータスを0に戻す
             $player_obj->update_status($player_id, 0);
-            // 余りを求める奇数ならplayer1の勝利、偶数ならplayer2の勝利
-            $rem = $result->winner % 2;
-            // 商から勝利の理由を求める
-            $win_result = ($result->winner + $rem) / 2;
             // return $result->winner === 1 ? view('win') : view('lose');
             // 余りが1なら0(勝利)を余りが0なら1(敗北)を返す、win_resultには勝敗の理由を返す
             return response()->json(['winner' => $rem === 1 ? 0 : 1, 'win_result' => $win_result]);
