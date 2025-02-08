@@ -66,6 +66,11 @@ Route::get('/oyster/result/{game_id}', [
     'show_result',
 ]);
 
+Route::get('/oyster/status', [
+    OysterController::class,
+    'retrun_player_status',
+])
+
 Route::get('/oyster/win', function() {
     return view('win');
 });

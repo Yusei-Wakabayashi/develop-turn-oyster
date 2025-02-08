@@ -247,51 +247,77 @@ class OysterController extends Controller
                     }
                     switch($win_status)
                     {
-                        // ターン数を増やして保存
-                        // ターン終了イベントを発行
                         case 0:
                             $turn = $game->turn + 1;
+                            // ターン数を増やして保存
                             $game_obj->update_info($player_id, $game->id, $player_board, $enemy_board, $turn);
+                            // ターン終了イベントを発行
                             event(new OysterTurnEnd($game->id));
                             return response()->json(['message' => 'ok']);
-                        // 勝利なら情報をresultに保存
-                        // ゲーム情報は削除する
-                        // playerのステータスを4(勝敗決定にする)
-                        // 勝敗決定イベントの発行
                         case 1:
                             $winner = 0;
                             if($game->player1 === $player_id)
                             {
+                                // 王冠ありオイスターをすべて取得したplayer1の勝利
                                 $winner = 1;
                             }
                             else if($game->player2 === $player_id)
                             {
+                                // 王冠ありオイスターをすべて取得したplayer2の勝利
                                 $winner = 2;
                             }
+                            // 勝利なら情報をresultに保存
                             $result_obj->create_result($game->id, $game->player1, $game->player2, $winner);
+                            // ゲーム情報は削除する
                             $game_obj->delete_game($game->id);
+                            // playerのステータスを4(勝敗決定にする)
                             $player_obj->update_status($game->player1, 4);
                             $player_obj->update_status($game->player2, 4);
+                            // 勝敗決定イベントの発行
                             event(new OysterEndGame($game->id));
                             return response()->json(['message' => 'ok']);
-                        // 敗北なら情報をresultに保存
-                        // ゲーム情報は削除する
-                        // playerのステータスを4(勝敗決定にする)
-                        // 勝敗決定イベントの発行
                         case 2:
                             $winner = 0;
                             if($game->player1 === $player_id)
                             {
-                                $winner = 2;
+                                // 王冠なしオイスターをすべて取得したplayer1の敗北
+                                $winner = 4;
                             }
                             else if($game->player2 === $player_id)
                             {
-                                $winner = 1;
+                                // 王冠なしオイスターをすべて取得したplayer2の敗北
+                                $winner = 3;
                             }
+                            // 敗北なら情報をresultに保存
                             $result_obj->create_result($game->id, $game->player1, $game->player2, $winner);
+                            // ゲーム情報は削除する
                             $game_obj->delete_game($game->id);
+                            // playerのステータスを4(勝敗決定にする)
                             $player_obj->update_status($game->player1, 4);
                             $player_obj->update_status($game->player2, 4);
+                            // 勝敗決定イベントの発行
+                            event(new OysterEndGame($game->id));
+                            return response()->json(['message' => 'ok']);
+                        case 3:
+                            $winner = 0;
+                            if($game->player1 === $player_id)
+                            {
+                                // 両端を取得したplayer1の勝利
+                                $winner = 5;
+                            }
+                            else if($game->player2 === $player_id)
+                            {
+                                // 両端を取得したplayer2の勝利
+                                $winner = 6;
+                            }
+                            // 敗北なら情報をresultに保存
+                            $result_obj->create_result($game->id, $game->player1, $game->player2, $winner);
+                            // ゲーム情報は削除する
+                            $game_obj->delete_game($game->id);
+                            // playerのステータスを4(勝敗決定にする)
+                            $player_obj->update_status($game->player1, 4);
+                            $player_obj->update_status($game->player2, 4);
+                            // 勝敗決定イベントの発行
                             event(new OysterEndGame($game->id));
                             return response()->json(['message' => 'ok']);
                     }
@@ -376,17 +402,20 @@ class OysterController extends Controller
     // 勝利判定関数(勝利なら1敗北なら2を返すどちらでもなければ0を返す)
     public function win_controll($board, $enemy_board, $most_left, $most_right)
     {
+        // 相手の王冠ありオイスターをすべて取得した勝利
         if(substr_count($enemy_board, "1") === 0)
         {
             return 1;
         }
+        // 相手の王冠なしオイスターをすべて取得した敗北
         if(substr_count($enemy_board, "2") === 0)
         {
             return 2;
         }
+        // 両端にオイスターがある場合勝利
         if(($board[$most_left] == "1" || $board[$most_left] == "2") && ($board[$most_right] == "1" || $board[$most_right] == "2"))
         {
-            return 1;
+            return 3;
         }
         return 0;
     }
@@ -612,7 +641,8 @@ class OysterController extends Controller
         $player = $player_obj->get_player($player_id);
         // ゲームの情報を取得
         $game = $game_obj->player_game($player_id);
-        $return_data = OysterController::first($game->id, $request->session()->get('player_id'));
+        // $return_data = OysterController::first($game->id, $request->session()->get('player_id'));
+        $return_data = OysterController::first($game->id, $request->session()->get('player_id')) ? 1 : 0;
         return response()->json(['first' => $return_data]);
     }
     // result画面を返す
@@ -643,16 +673,28 @@ class OysterController extends Controller
         if ($result->player1 === $player_id) {
             // プレイヤーのステータスを0に戻す
             $player_obj->update_status($player_id, 0);
+            // 余りを求める奇数ならplayer1の勝利、偶数ならplayer2の勝利
+            $rem = $result->winner % 2;
+            // 商から勝利の理由を求める
+            $win_result = ($result->winner + $rem) / 2;
             // return $result->winner === 1 ? view('win') : view('lose');
-            return $result->winner === 1 ? 0 : 1;
+            // 余りが1なら0(勝利)を余りが0なら1(敗北)を返す、win_resultには勝敗の理由を返す
+            return response()->json(['winner' => $rem === 1 ? 0 : 1, 'win_result' => $win_result]);
         } elseif ($result->player2 === $player_id) {
             $player_obj->update_status($player_id, 0);
             // return $result->winner === 2 ? view('win') : view('lose');
-            return $result->winner === 2 ? 0 : 1;
+            // 余りが0なら0(勝利)を余りが1なら1(敗北)を返す、win_resultには勝敗の理由を返す
+            return response()->json(['winner' => $rem === 0 ? 0 : 1, 'win_result' => $win_result]);
         }
 
         // どちらのプレイヤーにも該当しない場合
         return response()->json(['message' => 'Player not part of this game'], 403);
     }
-
+    public function return_player_status(Request $request)
+    {
+        $player_obj = new OysterPlayer();
+        $player_id = $request->session()->get('player_id');
+        $player = $player_obj->get_player($player_id);
+        return response()->json(['status' => $player->status]);
+    }
 }

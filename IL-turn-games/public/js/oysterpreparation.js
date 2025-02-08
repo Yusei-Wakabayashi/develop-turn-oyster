@@ -70,6 +70,7 @@ function check_oysterpreparation(game_id) {
         return false;
     }
     console.log(game_id);
+    // 先攻後攻の取得
     fetch(`/oyster/first`, {
         method: 'GET',
         headers: {
@@ -78,6 +79,7 @@ function check_oysterpreparation(game_id) {
     })
     .then(response => response.json()) // サーバーからのレスポンスをJSONで受け取る
     .then(data => {
+        //trueなら先攻
         if (data['first']) {
             // 適切な位置にオイスターがあるかどうかをチェック
             var kingoyster = 1;
@@ -85,7 +87,7 @@ function check_oysterpreparation(game_id) {
             var kingcount = 0;
             var nomalcount = 0;
             var count = 0;
-
+            // 先攻なら17,18,21,22の下側に自分のオイスターが配置されているか確認
             for (var i = 0; i < 24; i++) {
                 if (i == 17 || i == 18 || i == 21 || i == 22) {
                     if (board[i] == kingoyster) {
@@ -114,6 +116,7 @@ function check_oysterpreparation(game_id) {
                 return false;
             }
         }
+        //falseなら後攻
         else {
             // 適切な位置にオイスターがあるかどうかをチェック
             var kingoyster = 1;
@@ -121,7 +124,7 @@ function check_oysterpreparation(game_id) {
             var kingcount = 0;
             var nomalcount = 0;
             var count = 0;
-
+            // 後攻なら1,2,5,6の上側に自分のオイスターが配置されているか確認
             for (var i = 0; i < 24; i++) {
                 if (i == 1 || i == 2 || i == 5 || i == 6) {
                     if (board[i] == kingoyster) {
