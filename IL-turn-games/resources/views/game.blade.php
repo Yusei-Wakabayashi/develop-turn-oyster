@@ -47,30 +47,63 @@
         </tr>
     </table>
     <div id="turn"></div>
+    <div id="change"></div>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="{{asset('js/oystergame.js')}}"></script>
     <script>
-        const controller = new AbortController();
-        var pusher = new Pusher("{{ config('const.pusher.app_key') }}", {
-            cluster: "{{ config('const.pusher.cluster') }}"
-        });
-        // チャンネル名に埋め込まれた変数をJavaScriptで適切に渡す
-        var game_id = @json($game_id); // Bladeの変数をJavaScriptに渡す
-        var channel = pusher.subscribe(`game.${game_id}`);
-        channel.bind('game_end', function(data) {
-            if (typeof controller !== "undefined") {
-                controller.abort();
+        async function get_game_id() {
+            try {
+                const response = await fetch(`/oyster/id/game`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log("取得した game_id:", data['game_id']);
+                return data['game_id'] || null;
+            } catch (error) {
+                console.error("Error fetching game ID:", error);
+                return null;
             }
-            console.log('game_end');
-            // ゲーム終了イベント検知で結果取得
-            window.location.href = `{{ url('/oyster/result') }}/${game_id}`;
-        });
-        channel.bind('turn_end', function(data) {
-            // ターン終了イベント検知でゲーム情報取得
-            console.log('turn_end');
+        }
+
+        async function initializeGame() {
+            const controller = new AbortController();
+            const game_id = await get_game_id();
+            
+            if (!game_id) {
+                console.error("ゲームIDが取得できませんでした");
+                return;
+            }
+
+            console.log("取得した game_id:", game_id);
+
+            Pusher.logToConsole = true; // ログを有効化
+
+            var pusher = new Pusher("{{ config('const.pusher.app_key') }}", {
+                cluster: "{{ config('const.pusher.cluster') }}",
+                forceTLS: true
+            });
+
+            var channel = pusher.subscribe(`game.${game_id}`);
+            console.log("Subscribed to channel:", channel.name);
+
+            channel.bind('game_end', function(data) {
+                console.log("game_end イベント受信:", data);
+                if (typeof controller !== "undefined") {
+                    controller.abort();
+                }
+                window.location.href = `{{ url('/oyster/image/result') }}`;
+            });
+
+            channel.bind('turn_end', function(data) {
+                console.log("turn_end イベント受信:", data);
+                game_info();
+            });
+
             game_info();
-        });
-        game_info();
+        }
+
+        document.addEventListener("DOMContentLoaded", initializeGame);
     </script>
 </body>
 </html>

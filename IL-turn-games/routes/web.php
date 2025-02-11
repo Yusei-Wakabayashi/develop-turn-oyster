@@ -26,15 +26,23 @@ Route::get('/oyster/match', [
     'match',
 ]);
 
-Route::get('/oyster/standby', [
+Route::get('/oyster/id/room', [
     OysterController::class,
-    'check_standby',
+    'get_room_id',
 ]);
 
-Route::get('/oyster/preparation', [
+Route::get('/oyster/standby', function () {
+    return view('standby');
+});
+
+Route::get('/oyster/id/preparation', [
     OysterController::class,
-    'check_preparation',
+    'get_preparation',
 ]);
+
+Route::get('/oyster/preparation', function () {
+    return view('preparation');
+});
 
 Route::get('/oyster/first', [
     OysterController::class,
@@ -46,10 +54,14 @@ Route::post('/oyster/start', [
     'start_game',
 ]);
 
-Route::get('/oyster/game', [
+Route::get('/oyster/id/game', [
     OysterController::class,
-    'check_game',
+    'get_game_id',
 ]);
+
+Route::get('/oyster/game', function () {
+    return view('game');
+});
 
 Route::get('/oyster/info', [
     OysterController::class,
@@ -69,7 +81,7 @@ Route::get('/oyster/result/{game_id}', [
 Route::get('/oyster/status', [
     OysterController::class,
     'retrun_player_status',
-])
+]);
 
 Route::get('/oyster/win', function() {
     return view('win');
@@ -77,6 +89,15 @@ Route::get('/oyster/win', function() {
 
 Route::get('/oyster/lose', function() {
     return view('lose');
+});
+
+Route::get('/oyster/change/result', [
+    OysterController::class,
+    'show_change_result',
+]);
+
+Route::get('/oyster/image/result', function() {
+    return view('result');
 });
 
 Route::get('/test', [

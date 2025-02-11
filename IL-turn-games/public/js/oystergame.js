@@ -50,6 +50,7 @@ async function game_info() {
         }
         // 非同期処理を待つ
         const game_data = await get_game_info();
+        await get_result_info();
         console.log(game_data);
         // ゲーム情報を取得できればボードを更新
         if (game_data) {
@@ -80,6 +81,57 @@ async function game_info() {
     catch (error) {
         console.error('An error occurred:', error);
     }
+}
+
+// 変更履歴の取得
+async function get_result_info() {
+    // サーバーからゲーム情報を取得
+    const response = await fetch('/oyster/change/result', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    const data = await response.json(); // サーバーからのレスポンスをJSONで受け取る
+    console.log(data);
+    // サーバーからのレスポンスが成功ならばゲーム情報を返す
+    var message = "";
+    if(data['message'] === 'no change')
+    {
+        message = "";
+    }
+    if (data['player'] === 'you') {
+        console.log('you get oyster');
+        if(data['oyster'] === 1)
+        {
+            message = "You get kingoyster!";
+            console.log('you get kingoyster');
+        }
+        else if(data['oyster'] === 2)
+        {
+            message = "You get normaloyster!";
+            console.log('you get normaloyster');
+        }
+    }
+    else if (data['player'] === 'enemy') {
+        console.log('enemy get oyster');
+        if(data['oyster'] === 1)
+        {
+            message = "Enemy get kingoyster!";
+            console.log('enemy get kingoyster');
+        }
+        else if(data['oyster'] === 2)
+        {
+            message = "Enemy get normaloyster!";
+            console.log('enemy get normaloyster');
+        }
+    }
+    // サーバーからのレスポンスが失敗ならばfalseを返す
+    else {
+        console.log('not success');
+        return false;
+    }
+    document.getElementById('change').textContent = message;
 }
 
 function update_board(board) {
