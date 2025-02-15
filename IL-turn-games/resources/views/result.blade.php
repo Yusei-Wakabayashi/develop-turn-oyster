@@ -41,7 +41,7 @@
                 const data = await response.json();
                 console.log("取得した winner:", data['winner']);
                 console.log("取得した win_result:", data['win_result']);
-                if(data['winner'] == 1)
+                if(data['winner'] == 0)
                 {
                     document.getElementById("result").textContent = "you win";
                 }

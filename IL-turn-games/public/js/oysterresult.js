@@ -14,7 +14,7 @@ function sendmatch()
         }
         if(data['game_id'])
         {
-            window.location.href = '/oyster/game';
+            window.location.href = '/oyster/preparation';
         }
     })
 }
