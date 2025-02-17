@@ -738,4 +738,25 @@ class OysterController extends Controller
         // 変更結果を返す
         return response()->json(['player' => $change_data->player_id === $player_id ? 'you' : 'enemy', 'oyster' => $change_data->oyster]);
     }
+
+    public function get_oyster_number_result(Request $request, $game_id)
+    {
+        $player_id = $request->session()->get('player_id');
+        $change_result_obj = new OysterChangeResult();
+        $oyster_numbers = $change_result_obj->get_all_result($game_id, $player_id);
+        $kingoyster = 0;
+        $normaloyster = 0;
+        foreach($oyster_numbers as $oyster_number)
+        {
+            if($oyster_number->oyster === 1)
+            {
+                $kingoyster++;
+            }
+            else if($oyster_number->oyster === 2)
+            {
+                $normaloyster++;
+            }
+        }
+        return response()->json(['kingoyster' => $kingoyster, 'normaloyster' => $normaloyster]);
+    }
 }

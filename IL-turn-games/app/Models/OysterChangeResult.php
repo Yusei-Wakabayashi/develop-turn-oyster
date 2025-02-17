@@ -26,4 +26,10 @@ class OysterChangeResult extends Model
     {
         return OysterChangeResult::where('game_id', $game_id)->orderBy('created_at', 'desc')->first();
     }
+
+    // ゲームの変更結果をgame_idとplayer_idを基に全件取得します
+    public function get_all_result($game_id, $player_id)
+    {
+        return OysterChangeResult::where('game_id', $game_id)->where('player_id', $player_id)->get();
+    }
 }

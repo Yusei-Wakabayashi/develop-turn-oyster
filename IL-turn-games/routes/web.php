@@ -100,6 +100,11 @@ Route::get('/oyster/image/result', function() {
     return view('result');
 });
 
+Route::get('/oyster/number/{game_id}', function() {
+    OysterController::class,
+    'show_change_result',
+});
+
 Route::get('/test', [
     OysterController::class,
     'show_request',

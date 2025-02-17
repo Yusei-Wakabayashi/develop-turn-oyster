@@ -9,6 +9,8 @@
 <body>
     <h1 id="result"></h1>
     <div id="cause"></div>
+    <div id="kingnum"></div>
+    <div id="normalnum"></div>
     <script src="{{asset('js/oysterresult.js')}}"></script>
     <button id="sendbutton">もう一度</button>
     <script>
@@ -27,6 +29,27 @@
                 return data['game_id'] || null;
             } catch (error) {
                 console.error("Error fetching game ID:", error);
+                return null;
+            }
+        }
+
+        async function get_oyster_number(game_id)
+        {
+            try {
+                const response = await fetch(`/oyster/number/${game_id}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+                console.log("取得した king:", data['kingoyster']);
+                console.log("取得した normal:", data['normaloyster']);
+                //
+                document.getElementById("kingnum").textContent = data['kingoyster'];
+                document.getElementById("normalnum").textContent = data['normaloyster'];
+
+                return data || null;
+            } catch (error) {
+                console.error("Error:", error);
                 return null;
             }
         }
@@ -83,6 +106,7 @@
 
             console.log("取得した game_id:", game_id);
             result_info(game_id);
+            get_oyster_number(game_id);
         }
 
         document.addEventListener("DOMContentLoaded", initializeGame);
