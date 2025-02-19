@@ -60,6 +60,6 @@
             initialize();
         });
     </script>
-    <h1 id="match_text">マッチング中</h1>
+    <h1 id="match_text">matching...</h1>
 </body>
 </html>

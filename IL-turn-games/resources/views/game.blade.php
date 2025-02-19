@@ -46,8 +46,44 @@
             <td></td>
         </tr>
     </table>
+    <span id="explanation">Click to select, use arrow keys to move</span>
+    <div id="gamerlue">  
+        if all of your king oysters are taken, you lose.<br>
+        if you take all of your opponent's king oysters, you win.<br>
+        if all of your normal oysters are taken, you win.<br>
+        if you take all of your opponent's normal oysters, you lose.<br>
+        You win if you occupy both ends of the green,<br>
+        You lose if both ends of red are occupied.
+    </div>
     <div id="turn"></div>
     <div id="change"></div>
+    <div id="oysterexplanation">
+        ○ is kingoyster
+        ● is normaloyster
+        ▲ is enemyoyster
+    </div>
+    
+    <style>
+        .myboth
+        {
+            background-color: red;
+        }
+        .enemyboth
+        {
+            background-color: lightgreen;
+        }
+        .selected {
+            background-color: blue; /* 選択中のアイテムを強調 */
+        }
+        #explanation
+        {
+            color: blue;
+        }
+        #gamerlue
+        {
+            color: blue;
+        }
+    </style>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="{{asset('js/oystergame.js')}}"></script>
     <script>

@@ -653,7 +653,7 @@ class OysterController extends Controller
         $player = $player_obj->get_player($player_id);
         // ゲームの情報を取得
         $game = $game_obj->player_game($player_id);
-        $return_data = OysterController::first($game->id, $request->session()->get('player_id'));
+        // $return_data = OysterController::first($game->id, $request->session()->get('player_id'));
         $return_data = OysterController::first($game->id, $request->session()->get('player_id')) ? 1 : 0;
         return response()->json(['first' => $return_data]);
     }
@@ -733,7 +733,7 @@ class OysterController extends Controller
         $change_data = $change_result_obj->get_change_result($game->id);
         if(!$change_data)
         {
-            return response()->json(['message' => 'no change']);
+            return response()->json(['message' => 'nochange']);
         }
         // 変更結果を返す
         return response()->json(['player' => $change_data->player_id === $player_id ? 'you' : 'enemy', 'oyster' => $change_data->oyster]);

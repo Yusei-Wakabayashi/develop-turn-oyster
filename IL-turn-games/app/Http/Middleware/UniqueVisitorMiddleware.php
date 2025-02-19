@@ -20,10 +20,17 @@ class UniqueVisitorMiddleware
         if (!$request->session()->has('player_id')) {
             $playerId = uniqid('player_', true); // 一意のIDを生成
             $request->session()->put('player_id', $playerId); // セッションに保存
-            $oyserplayer = new OysterPlayer();
-            $oyserplayer->create_player($playerId);
         }
-
+        // セッションからplayer_idを取得
+        $player_id = $request->session()->get('player_id');
+        $oysterplayer = new OysterPlayer();
+        // player_idを基にデータを取得
+        $player_num = $oysterplayer->get_player($player_id);
+        // データが存在しなければ作成
+        if(!$player_num)
+        {
+            $oysterplayer->create_player($player_id);
+        }
         return $next($request);
     }
 }

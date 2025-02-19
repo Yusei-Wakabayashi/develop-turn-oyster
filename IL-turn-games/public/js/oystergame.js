@@ -34,8 +34,8 @@ async function checkfirst() {
     const data = await response.json(); // サーバーからのレスポンスをJSONで受け取る
     console.log(data);
 
-    // 先攻か後攻を判定
-    return data['first'] ? 1 : 0;
+    // 先攻か後攻を返す
+    return data['first'];
 }
 // ゲーム情報の取得
 async function game_info() {
@@ -47,6 +47,22 @@ async function game_info() {
         if (first === null) {
             console.log('error');
             return;
+        }
+        // 先攻後攻で相手の両端を緑に自分の両端を赤くする
+        var oyster_board = document.querySelectorAll('.board td');
+        if(first === 1)
+        {
+            oyster_board[0].classList.add("enemyboth");
+            oyster_board[3].classList.add("enemyboth");
+            oyster_board[20].classList.add("myboth");
+            oyster_board[23].classList.add("myboth");
+        }
+        else if(first === 0)
+        {
+            oyster_board[0].classList.add("myboth");
+            oyster_board[3].classList.add("myboth");
+            oyster_board[20].classList.add("enemyboth");
+            oyster_board[23].classList.add("enemyboth");
         }
         // 非同期処理を待つ
         const game_data = await get_game_info();
@@ -126,6 +142,12 @@ async function get_result_info() {
             console.log('enemy get normaloyster');
         }
     }
+    // サーバーからの情報が変更なしならfalseを返す
+    else if(data['message'] == 'nochange')
+    {
+        console.log('nochange');
+        return false;
+    }
     // サーバーからのレスポンスが失敗ならばfalseを返す
     else {
         console.log('not success');
@@ -167,19 +189,26 @@ function update_board(board) {
     }
 }
 // td要素がクリックされたら
-var cellIndex;
+var cellIndex = null;
 tableCells.forEach(cell => {
     cell.addEventListener('click', () => {
-        // boardの何番目がクリックされたかを取得
-        cellIndex = Array.prototype.indexOf.call(tableCells, cell);
-        console.log(cellIndex);
+        clear_select();
+        // 現在選択状態のセルをクリックされたら選択していない状態にする関数でnullにしたら以下の処理が実行されないように
+        if(cell_disable(Array.prototype.indexOf.call(tableCells, cell)))
+        {
+            // boardの何番目がクリックされたかを取得
+            cellIndex = Array.prototype.indexOf.call(tableCells, cell);
+            // 移動可能な位置を表示する関数
+            board_uisupport();
+            console.log(cellIndex);
+        }
     });
 });
 
 // 動かしたい方向を矢印キーで取得
 document.addEventListener('keydown', (event) => {
     // クリックされた状態かつ矢印キーが押された状態であれば
-    if (cellIndex !== undefined) {
+    if (cellIndex !== null) {
         // 盤面の要素番号と矢印キーの情報を取得
         move_piece(cellIndex, event.key);
         console.log(event.key);
@@ -188,7 +217,7 @@ document.addEventListener('keydown', (event) => {
 
 // 要素数チェック関数
 function check_cellIndex(cellIndex) {
-    // 要素番号は0~23の想定
+    // 要素番号が0未満24以上であればerror
     if (cellIndex < 0 || cellIndex > 23) {
         console.log('error');
         return false;
@@ -305,6 +334,8 @@ function move_piece(cellIndex, direction) {
             console.log('input error');
             break;
         }
+        // 移動可能な位置を初期化
+        clear_select();
         // 自分の番になるまで操作を行えないようにする
         disableInput();
         // ボード情報をサーバーに送信する関数
@@ -363,4 +394,74 @@ function enableInput() {
     tableCells.forEach(cell => {
         cell.style.pointerEvents = 'auto';
     });
+}
+// 移動可能な位置を表示する関数
+function board_uisupport()
+{
+    console.log("boarduisupport");
+    // 移動先の位置を定義
+    const moves = [
+        // 上
+        cellIndex - 4,
+        // 下
+        cellIndex + 4,
+        // 左
+        cellIndex - 1,
+        // 右
+        cellIndex + 1
+    ];
+    var oyster_board = document.querySelectorAll('.board td');
+    // クリックされた位置が自分のオイスターであること
+    // 移動先がboardの範囲内かつであること
+    // 4で割った結果が1以上であること、移動先が空もしくは相手のオイスターであること
+    // 上
+    if((oyster_board[cellIndex].innerHTML == '○' || oyster_board[cellIndex].innerHTML == '●') && check_cellIndex(moves[0]) && cellIndex / 4 > 0 && (oyster_board[moves[0]].innerHTML == '■' || oyster_board[moves[0]].innerHTML == '▲'))     
+    {
+        console.log('up is enable direction');
+        oyster_board[moves[0]].classList.add("selected");
+    }
+    // 下
+    // 4で割った結果が6未満であること、移動先が空もしくは相手のオイスターであること
+    if((oyster_board[cellIndex].innerHTML == '○' || oyster_board[cellIndex].innerHTML == '●') && check_cellIndex(moves[1]) && cellIndex / 4 < 6 && (oyster_board[moves[1]].innerHTML == '■' || oyster_board[moves[1]].innerHTML == '▲'))     
+    {
+        console.log('down is enable direction');
+        oyster_board[moves[1]].classList.add("selected");
+    }
+    // 左
+    // 4で割った余りが1以上であること、移動先が空もしくは相手のオイスターであること
+    if((oyster_board[cellIndex].innerHTML == '○' || oyster_board[cellIndex].innerHTML == '●') && check_cellIndex(moves[2]) && cellIndex % 4 > 0 && (oyster_board[moves[2]].innerHTML == '■' || oyster_board[moves[2]].innerHTML == '▲'))     
+    {
+        console.log('left is enable direction');
+        oyster_board[moves[2]].classList.add("selected");
+    }
+    // 右
+    // 4で割った余りが3未満であること、移動先が空もしくは相手のオイスターであること
+    if((oyster_board[cellIndex].innerHTML == '○' || oyster_board[cellIndex].innerHTML == '●') && check_cellIndex(moves[3]) && cellIndex % 4 < 3 && (oyster_board[moves[3]].innerHTML == '■' || oyster_board[moves[3]].innerHTML == '▲'))     
+    {
+        console.log('right is enable derection');
+        oyster_board[moves[3]].classList.add("selected");
+    }
+}
+// 既に選択状態なら選択していない状態にする関数
+function cell_disable(cellindex)
+{
+    // 選択された位置と、現在の位置が同じならnullに
+    if(cellindex == cellIndex)
+    {
+        cellIndex = null;
+        console.log("clear select");
+        clear_select();
+        return false;
+    }
+    console.log("select oyster");
+    return true;
+}
+function clear_select()
+{
+    var oyster_board = document.querySelectorAll('.board td');
+    for(let i = 0; i < oyster_board.length; i++)
+    {
+        // 移動可能な位置を初期化
+        oyster_board[i].classList.remove("selected");
+    }
 }

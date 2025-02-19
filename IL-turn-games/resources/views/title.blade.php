@@ -9,8 +9,8 @@
 <body>
     <script src="{{asset('js/oystertitle.js')}}"></script>
     <h1>oyster_game</h1>
-    <label for="">対人</label>
-    <button id="sendbutton">開始</button>
+    <label for="">battle</label>
+    <button id="sendbutton">start</button>
     <script>
         var sendbutton = document.getElementById("sendbutton");
         sendbutton.addEventListener("click", function() {

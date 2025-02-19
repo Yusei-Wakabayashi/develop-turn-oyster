@@ -12,7 +12,7 @@
     <div id="kingnum"></div>
     <div id="normalnum"></div>
     <script src="{{asset('js/oysterresult.js')}}"></script>
-    <button id="sendbutton">もう一度</button>
+    <button id="sendbutton">once again</button>
     <script>
         var sendbutton = document.getElementById("sendbutton");
         sendbutton.addEventListener("click", function() {
@@ -44,8 +44,8 @@
                 console.log("取得した king:", data['kingoyster']);
                 console.log("取得した normal:", data['normaloyster']);
                 //
-                document.getElementById("kingnum").textContent = data['kingoyster'];
-                document.getElementById("normalnum").textContent = data['normaloyster'];
+                document.getElementById("kingnum").textContent = 'you get kingoyster' + data['kingoyster'];
+                document.getElementById("normalnum").textContent = 'your get normaloyster' +  data['normaloyster'];
 
                 return data || null;
             } catch (error) {
@@ -75,19 +75,19 @@
                 switch (data['win_result'])
                 {
                     case 0:
-                        document.getElementById("cause").textContent = "予期せぬエラー";
+                        document.getElementById("cause").textContent = "unexpected error";
                         break;
                     case 1:
-                        document.getElementById("cause").textContent = "王冠の取得";
+                        document.getElementById("cause").textContent = "kingoyster get";
                         break;
                     case 2:
-                        document.getElementById("cause").textContent = "王冠なしの取得";
+                        document.getElementById("cause").textContent = "normaloyster get";
                         break;
                     case 3:
-                        document.getElementById("cause").textContent = "両端の占領";
+                        document.getElementById("cause").textContent = "occupation of both ends";
                         break;
                     default:
-                        document.getElementById("cause").textContent = "その他";
+                        document.getElementById("cause").textContent = "etc...";
                         break;
                 }
             } catch (error) {
@@ -113,8 +113,8 @@
     </script>
     <form action="{{ url('/oyster/title') }}" method="GET">
         @csrf
-        <label for="">タイトルに戻る</label>
-        <button type="submit" class="btn btn-primary">終了</button>
+        <label for="">Return to title</label>
+        <button type="submit" class="btn btn-primary">end</button>
     </form>
 </body>
 </html>
