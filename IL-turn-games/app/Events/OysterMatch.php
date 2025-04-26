@@ -19,7 +19,7 @@ class OysterMatch implements ShouldBroadcast
      */
     public function __construct($room)
     {
-        $this->room = $room
+        $this->room = $room;
     }
 
     /**
