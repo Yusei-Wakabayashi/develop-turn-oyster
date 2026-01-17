@@ -62,9 +62,9 @@ class OysterController extends Controller
                 event(new OysterPreparation($room->id));
                 // 準備画面を返す
                 // APIモード
-                // return response()->json(['game_id' => $game_id]);
+                return response()->json(['game_id' => $game_id]);
                 // 単独モード
-                return view('preparation', ['game_id' => $game_id]);
+                // return view('preparation', ['game_id' => $game_id]);
             }
             // ルームのステータスが0(空き)のものを取得
             $room = $room_obj->search_status(0);
@@ -77,9 +77,9 @@ class OysterController extends Controller
                 $player_obj->update_status($player_id, 1);
                 // 待機画面とroom_idを返す
                 // APIモード
-                // return response()->json(['room_id' => $room->id]);
+                return response()->json(['room_id' => $room->id]);
                 // 単独モード
-                return view('standby', ['room_id' => $room->id]);
+                // return view('standby', ['room_id' => $room->id]);
             }
             // ルームが存在しない場合ルームを作成する処理を書く
             return response()->json(['player_id' => $player_id]);
@@ -91,9 +91,9 @@ class OysterController extends Controller
             $room = $room_obj->search_player($player_id);
             // 待機画面とroom_idを返す
             // APIモード
-            // return response()->json(['room_id' => $room->id]);
+            return response()->json(['room_id' => $room->id]);
             // 単独モード
-            return view('standby', ['room_id' => $room->id]);
+            // return view('standby', ['room_id' => $room->id]);
         }
         elseif($player->status === 2)
         {
@@ -101,9 +101,9 @@ class OysterController extends Controller
             $game = $game_obj->player_game($player_id);
             // 準備画面を返す処理を書く
             // APIモード
-            // return response()->json(['game_id' => $game->id]);
+            return response()->json(['game_id' => $game->id]);
             // 単独モード
-            return view('preparation', ['game_id' => $game->id]);
+            // return view('preparation', ['game_id' => $game->id]);
         }
     }
 
@@ -502,9 +502,9 @@ class OysterController extends Controller
             $room = $room_obj->search_player($player_id);
             // 待機画面とroom_idを返す
             // APIモード
-            // return response()->json(['room_id' => $room->id]);
+            return response()->json(['room_id' => $room->id]);
             // 単独モード
-            return view('standby', ['room_id' => $room->id]);
+            // return view('standby', ['room_id' => $room->id]);
         }
         return response()->json(['message' => 'not ready']);
     }
@@ -523,9 +523,9 @@ class OysterController extends Controller
             $game = $game_obj->player_game($player_id);
             // 準備画面とgame_idを返す
             // APIモード
-            // return response()->json(['game_id' => $game->id]);
+            return response()->json(['game_id' => $game->id]);
             // 単独モード
-            return view('preparation', ['game_id' => $game->id]);
+            // return view('preparation', ['game_id' => $game->id]);
         }
         return response()->json(['message' => 'not ready']);
     }
@@ -544,9 +544,9 @@ class OysterController extends Controller
             $game = $game_obj->player_game($player_id);
             // ゲーム画面とgame_idを返す
             // APIモード
-            // return response()->json(['game_id' => $game->id]);
+            return response()->json(['game_id' => $game->id]);
             // 単独モード
-            return view('game', ['game_id' => $game->id]);
+            // return view('game', ['game_id' => $game->id]);
         }
         return response()->json(['message' => 'not ready']);
     }
